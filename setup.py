@@ -1,18 +1,16 @@
 from setuptools import setup, find_packages
 setup(
-    name = "cache-my-subreddit",
+    name = "cachemysubreddit",
     version = "0.0.1",
-    packages = find_packages('cache-my-subreddit'),
+    packages = find_packages('cachemysubreddit'),
 
-    install_requires = ['selenium', 'praw', 'beautifulsoup4'],
+    install_requires = ['selenium', 'praw', 'beautifulsoup4', 'click'],
+    include_package_data = True,
 
-    scripts = ['cache-my-subreddit/main.py'],
-
-    #entry_points={
-    #    'main_entry': [
-    #        'cache-my-subreddit=main:main'
-    #        ]
-    #    },
+    entry_points="""
+        [console_scripts]
+        cachemysubbreddit=cachemysubreddit.main:main
+        """,
 
     author = 'Sean Wilson',
     author_email = 'spwilson27@gmail.com',

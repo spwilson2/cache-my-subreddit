@@ -12,10 +12,14 @@ clean
 
 else
 
-virtualenv --clear --download -p /usr/bin/python3 venv --no-site-packages
+virtualenv --clear --download -p /usr/bin/python3 venv --no-site-packages &&
 
-source venv/bin/activate
+source venv/bin/activate  &&
 
+#pip3 install -e 'cache-my-subreddit' .
+pip3 install -e .
+
+#python3 setup.py develop
 #pip install -r scripts/requirements.txt
 
 
