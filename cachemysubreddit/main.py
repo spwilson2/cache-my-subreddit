@@ -1,9 +1,10 @@
 import click
 
 
-@click.command()
-def main():
+@click.group()
+def cli():
     pass
 
-if __name__ == '__main__':
-    main()
+@cli.command()
+def friend():
+    pass

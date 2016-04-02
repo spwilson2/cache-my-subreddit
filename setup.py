@@ -9,7 +9,7 @@ setup(
 
     entry_points="""
         [console_scripts]
-        cachemysubbreddit=cachemysubreddit.main:main
+        cachemysubbreddit=cachemysubreddit.main:cli
         """,
 
     author = 'Sean Wilson',
