@@ -24,7 +24,8 @@ pip3 install nose &&
 
 pip3 install -e $DIR &&
 
-alias test_package='python $DIR/setup.py test'
+alias test_package='python $DIR/setup.py test' &&
+alias develop='source $DIR/develop.sh' 
 
 if [ $? ]; then printf "
 ==================================================================
