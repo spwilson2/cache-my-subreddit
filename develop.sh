@@ -18,10 +18,6 @@ virtualenv --clear --download -p /usr/bin/python3 venv --no-site-packages &&
 
 source venv/bin/activate  &&
 
-#python3 setup.py develop
-#pip install -r develrequirements.txt
-pip3 install nose &&
-
 pip3 install -e $DIR &&
 
 alias test_package='python $DIR/setup.py test' &&
@@ -31,8 +27,8 @@ if [ $? ]; then printf "
 ==================================================================
 SUCCESS
 
-    You are now running a virtual environment for Reddit Image Bot
-    run 'deactivate' to leave
+    You are now running a virtual environment for Cache My 
+	Subreddit run 'deactivate' to leave
 ==================================================================
 "
 
