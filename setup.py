@@ -5,7 +5,7 @@ setup(
     version = "0.0.1",
     packages = find_packages(),
 
-    install_requires = ['praw', 'click'],
+    install_requires = ['praw', 'click', 'requests', 'fake-useragent'],
     include_package_data = True,
 
     entry_points="""
