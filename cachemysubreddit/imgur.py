@@ -1,5 +1,6 @@
 import re
 import os
+from bs4 import BeautifulSoup
 from urllib.request import urlopen, urlretrieve
 
 
@@ -29,20 +30,29 @@ class Imgur(object):
         except Exception:
             print(self.album_url)
             self.img_urls = []
-            return
-            #raise
+            raise
 
         # Read in the images now so we can get stats and stuff:
-        html = response.read().decode('utf-8')
-        matches = re.findall('<div id="(?P<id>[a-zA-Z0-9]+)"' +
-                             'class="post-image-container', html)
+        response_bs = BeautifulSoup(response)
+        matches = response_bs.find_all(
+                'div',
+                id=re.compile('[a-zA-Z0-9]+'),
+                class_='post-image-container')
 
-        self.img_urls = [(match, IMGUR_BASE_URL % match) for match in matches]
+        print(matches)
+
+
+        #= re.findall('<div id="(?P<id>[a-zA-Z0-9]+)"' + 'class="post-image-container', html)
+
+        self.img_urls = [(match['id'], IMGUR_BASE_URL % match['id']) for match in matches]
+        print(self.img_urls)
 
     def save_images(self, folder_path, name_prefix=''):
 
         if name_prefix:
             name_prefix += '-'
+
+        folder_path = os.path.abspath(folder_path)
 
         if not os.path.exists(folder_path):
             try:
@@ -50,6 +60,7 @@ class Imgur(object):
             except:
                 raise
 
+        print(self.img_urls)
         for count, (id_, image_url) in enumerate(self.img_urls):
 
             image_path = os.path.join(

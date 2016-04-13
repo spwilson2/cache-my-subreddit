@@ -54,19 +54,19 @@ def get_user_submissions(username):
         if possible_link is not None:
             return possible_link['href']
 
-    def get_submission_links(submission_html):
+    def get_submission_links_and_titles(submission_html):
         bs_obj = BeautifulSoup(submission_html)
         anchors = bs_obj.find_all('a', class_="title may-blank ")
 
         if anchors:
-            return (anchor['href'] for anchor in anchors)
+            return ((anchor.text, anchor['href']) for anchor in anchors)
 
     submission_links = []
 
-    first_submissions = get_submission_links(response.text)
+    submissions = get_submission_links_and_titles(response.text)
 
-    if first_submissions is not None:
-        submission_links.extend(first_submissions)
+    if submissions is not None:
+        submission_links.extend(submissions)
 
     # Traverse all the user's submitted pages.
     next_link = get_next_link(response)
@@ -78,10 +78,10 @@ def get_user_submissions(username):
                 headers=FAKE_HEADERS
                 )
 
-        more_submissions = get_submission_links(response.text)
+        submissions = get_submission_links_and_titles(response.text)
 
-        if more_submissions:
-            submission_links.extend(more_submissions)
+        if submissions:
+            submission_links.extend(submissions)
 
         next_link = get_next_link(response)
 
@@ -89,12 +89,3 @@ def get_user_submissions(username):
 
 FAKE_HEADERS = {'User-Agent': UserAgent().google}
 TIME_BETWEEN_GETS = 1
-
-if __name__ == '__main__':
-    import json
-    user = RedditUser()
-    credentials = json.loads(open('login-config.json').read())
-    user.login(**credentials)
-    for friend in user.list_friends():
-        print('Friend:', friend)
-        print(get_user_submissions(friend))
