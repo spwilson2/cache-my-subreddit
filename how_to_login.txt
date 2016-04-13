@@ -1,5 +1,0 @@
-Send POST request to https://www.reddit.com/api/login with form data:
-{
-"user": username,
-"passwd": password
-}

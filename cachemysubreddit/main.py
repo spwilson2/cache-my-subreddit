@@ -39,16 +39,8 @@ def friend(login, daemonize, path):
 
 
 def daemon_entry_point(credentials):
-
-    user = RedditUser()
-    user.login(**credentials)
-
-    #TODO Be smarter.
-    for friend in user.list_friends():
-        submissions = get_user_submissions(friend)
-        for title, url in submissions:
-            if Imgur.is_imgur_link(url):
-                Imgur(url).save_images(title, 'delete')
+    # TODO
+    pass
 
 def get_login(file_):
     return json.loads(file_.read())
