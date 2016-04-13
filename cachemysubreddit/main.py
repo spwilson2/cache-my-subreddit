@@ -29,5 +29,3 @@ FAKE_HEADERS = {'User-Agent': UserAgent().google}
 if __name__ == '__main__':
     cookies = login()
     list_friends(cookies)
-
-
