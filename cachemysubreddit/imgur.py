@@ -17,6 +17,7 @@ class Imgur(object):
         match = re.search(IMGUR_IMAGE_URL_REGEX, url)
 
         if match:
+            print(url)
             self.album_url = 'http://imgur.com/' + match.group('album_id')
         else:
             raise NotAnImgurAlbumException()
@@ -26,8 +27,10 @@ class Imgur(object):
         try:
             response = urlopen(url=self.album_url)
         except Exception:
-            self.response = False
-            raise
+            print(self.album_url)
+            self.img_urls = []
+            return
+            #raise
 
         # Read in the images now so we can get stats and stuff:
         html = response.read().decode('utf-8')

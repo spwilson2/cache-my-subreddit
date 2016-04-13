@@ -1,31 +1,28 @@
 import click
-import requests
 import json
-from fake_useragent import UserAgent
+from cachemysubreddit.reddit import RedditUser, get_user_submissions
+from cachemysubreddit.imgur import Imgur
 
 
 @click.group()
 def cli():
     pass
 
+
 @cli.command()
-def friend():
-    pass
+@click.option('-l', '--login', type=click.File('r'), required=True)
+def friend(login):
+    credentials = get_login(login)
+    user = RedditUser()
 
-def login():
-    login_info = json.loads('\n'.join(list(open('login-config.json'))))
-    response = requests.post('https://www.reddit.com/api/login',
-            login_info,
-        headers= FAKE_HEADERS
-        )
-    return response.cookies
+    user.login(**credentials)
 
-def list_friends(cookies):
-    print(requests.get('https://www.reddit.com/r/friends/', cookies=cookies,
-        headers=FAKE_HEADERS).text)
+    for friend in user.list_friends():
+        submissions = get_user_submissions(friend)
+        for submission in submissions:
+            if Imgur.is_imgur_link(submission):
+                Imgur(submission).save_images(submission, 'delete')
 
-FAKE_HEADERS = {'User-Agent': UserAgent().google}
 
-if __name__ == '__main__':
-    cookies = login()
-    list_friends(cookies)
+def get_login(file_):
+    return json.loads(file_.read())
