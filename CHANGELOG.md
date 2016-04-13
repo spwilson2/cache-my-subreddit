@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.1] - 2016-04-12
+### MODIFIED
+- cachemysubreddit/imgur.py
+If there imgur album was deleted or does not exist don't create a blank folder and don't fail catastrophically.
+
 ## [0.2.0] - 2016-04-12
 ### ADDED
 - CHANGELOG.md

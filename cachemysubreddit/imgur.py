@@ -28,9 +28,9 @@ class Imgur(object):
         try:
             response = urlopen(url=self.album_url)
         except Exception:
-            print(self.album_url)
             self.img_urls = []
-            raise
+            return
+            #raise
 
         # Read in the images now so we can get stats and stuff:
         response_bs = BeautifulSoup(response)
@@ -39,15 +39,14 @@ class Imgur(object):
                 id=re.compile('[a-zA-Z0-9]+'),
                 class_='post-image-container')
 
-        print(matches)
-
-
-        #= re.findall('<div id="(?P<id>[a-zA-Z0-9]+)"' + 'class="post-image-container', html)
-
         self.img_urls = [(match['id'], IMGUR_BASE_URL % match['id']) for match in matches]
         print(self.img_urls)
 
     def save_images(self, folder_path, name_prefix=''):
+
+        # If there weren't any images to download fuck off
+        if not self.img_urls:
+            return
 
         if name_prefix:
             name_prefix += '-'
