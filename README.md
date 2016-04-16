@@ -30,7 +30,7 @@ sudo python3 setup.py install
 
 ## Running
 
-To run after instillation or sourcing devlop.sh
+To run after instillation or sourcing develop.sh
 
 ```
 cachemysubreddit friend -l <login-config.json> [-p <path to top level directory>]

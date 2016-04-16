@@ -34,8 +34,9 @@ def friend(login, daemonize, path):
             title_path = clean_for_use_as_path(title)
             title_path = os.path.join(friend_path, title_path)
 
-            if Imgur.is_imgur_link(url):
-                Imgur(url).save_images(title_path, 'delete')
+            if not Imgur.test_save_exists(title_path):
+                if Imgur.is_imgur_link(url):
+                    Imgur(url).save_images(title_path, 'delete')
 
 
 def daemon_entry_point(credentials):

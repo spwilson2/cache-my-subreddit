@@ -42,6 +42,15 @@ class Imgur(object):
         self.img_urls = [(match['id'], IMGUR_BASE_URL % match['id']) for match in matches]
         print(self.img_urls)
 
+    @staticmethod
+    def test_save_exists(folder_path):
+
+        folder_path = os.path.abspath(folder_path)
+
+        if not os.path.exists(folder_path):
+            return False
+        return True
+
     def save_images(self, folder_path, name_prefix=''):
 
         # If there weren't any images to download fuck off

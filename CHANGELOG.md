@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.2] - 2016-04-15
+### MODIFIED
+- cachemysubreddit/imgur.py
+- cachemysubreddit/main.py
+imgur is not queried if the directories, for which images would be placed in, already exist.
+
+
 ## [0.2.1] - 2016-04-12
 ### MODIFIED
 - cachemysubreddit/imgur.py
