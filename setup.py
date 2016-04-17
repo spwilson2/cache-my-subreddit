@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "cachemysubreddit",
-    version = "0.2.1",
+    version = "0.3.0",
     packages = find_packages(),
 
     install_requires = ['praw', 'click', 'requests', 'fake-useragent', 'bs4',
@@ -11,7 +11,7 @@ setup(
 
     entry_points="""
         [console_scripts]
-        cachemysubbreddit=cachemysubreddit.main:cli
+        cachemysubreddit=cachemysubreddit.main:cli
         """,
 
     test_suite='nose.collector',

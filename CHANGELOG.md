@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## UNRELEASED
+
+## [0.3.0] - 2016-08-20
+### MODIFIED
+- setup.py 
+Changed the entrypoint (program name) to cachemysubreddit (previously typoed to cachemysubbreddit)
+- develop.sh
+Remove the --download flag to fix problems on other computers
+- cachemysubreddit/main.py
+Adds ability to download a subreddit with option `subreddit and -s <subreddit>`
+- cachemysubreddit/reddit.py
+Adds storage of mangled post titles as the folder name.
+
 ## [0.2.2] - 2016-04-15
 ### MODIFIED
 - cachemysubreddit/imgur.py

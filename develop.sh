@@ -14,7 +14,7 @@ clean
 
 else
 
-virtualenv --clear --download -p /usr/bin/python3 venv --no-site-packages &&
+virtualenv --clear -p /usr/bin/python3 venv --no-site-packages &&
 
 source venv/bin/activate  &&
 

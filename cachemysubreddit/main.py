@@ -2,13 +2,39 @@ import click
 import re
 import json
 import os
-from cachemysubreddit.reddit import RedditUser, get_user_submissions
+from cachemysubreddit.reddit import RedditUser, get_user_submissions, get_top_posts_from_subreddit
 from cachemysubreddit.imgur import Imgur
 
 
 @click.group()
 def cli():
     pass
+
+
+@cli.command()
+@click.option('-l', '--login', type=click.File('r'), required=True)
+@click.option('-p', '--path', type=click.Path(), default='./')
+@click.option('-s', '--subreddit', type=str, required=True)
+def subreddit(login, path, subreddit):
+    credentials = get_login(login)
+    user = RedditUser()
+    user.login(**credentials)
+
+    submissions = get_top_posts_from_subreddit(subreddit)
+
+    top_path = os.path.abspath(path)
+
+    subreddit_path = clean_for_use_as_path(subreddit)
+    subreddit_path = os.path.join(top_path, subreddit_path)
+
+    for title, url in submissions:
+
+        title_path = clean_for_use_as_path(title)
+        title_path = os.path.join(subreddit_path, title_path)
+
+        if not Imgur.test_save_exists(title_path):
+            if Imgur.is_imgur_link(url):
+                Imgur(url).save_images(title_path, 'delete')
 
 
 @cli.command()
@@ -30,6 +56,7 @@ def friend(login, daemonize, path):
         submissions = get_user_submissions(friend)
 
         for title, url in submissions:
+            print(str(title), str(url))
 
             title_path = clean_for_use_as_path(title)
             title_path = os.path.join(friend_path, title_path)
