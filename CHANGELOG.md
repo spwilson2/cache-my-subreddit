@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## UNRELEASED
+### MODIFIED
+- setup.py 
+Changed the entrypoint (program name) to cachemysubreddit (previously typoed to cachemysubbreddit)
+- develop.sh
+Remove the --download flag to fix problems on other computers
+
 ## [0.2.2] - 2016-04-15
 ### MODIFIED
 - cachemysubreddit/imgur.py
