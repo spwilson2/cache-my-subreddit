@@ -36,13 +36,30 @@ class RedditUser(object):
 
         return [anchor.text for anchor in friend_anchors]
 
+class RedditSubmission(object):
+    def __init__(self, title, user):
+        self.title = title
+        self.user = user
+
+
 def get_user_submissions(username):
     """Return a list of all urls to submitted content from the user."""
 
     submitted_url = 'https://www.reddit.com/user/%s/submitted/' % (username)
 
+    return _get_submissions_from_url(submitted_url)
+
+
+
+def get_top_posts_from_subreddit(subreddit):
+    subreddit_url = 'https://www.reddit.com/r/%s/top/' % (subreddit)
+
+    return _get_submissions_from_url(subreddit_url, depth=0)
+
+
+def _get_submissions_from_url(url, depth=500):
     response = requests.get(
-            submitted_url,
+            url,
             headers = FAKE_HEADERS
             )
 
@@ -70,7 +87,7 @@ def get_user_submissions(username):
 
     # Traverse all the user's submitted pages.
     next_link = get_next_link(response)
-    while next_link:
+    while next_link and depth > 0:
         sleep(TIME_BETWEEN_GETS)
 
         response = requests.get(
@@ -82,10 +99,11 @@ def get_user_submissions(username):
 
         if submissions:
             submission_links.extend(submissions)
-
         next_link = get_next_link(response)
+        --depth
 
     return(submission_links)
+
 
 FAKE_HEADERS = {'User-Agent': UserAgent().google}
 TIME_BETWEEN_GETS = 1

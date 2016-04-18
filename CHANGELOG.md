@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 Changed the entrypoint (program name) to cachemysubreddit (previously typoed to cachemysubbreddit)
 - develop.sh
 Remove the --download flag to fix problems on other computers
+- cachemysubreddit/main.py
+- cachemysubreddit/reddit.py
+Adds ability to download a subreddit with option `subreddit and -s <subreddit>`
 
 ## [0.2.2] - 2016-04-15
 ### MODIFIED
