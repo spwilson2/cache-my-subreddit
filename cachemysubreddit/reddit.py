@@ -37,9 +37,11 @@ class RedditUser(object):
         return [anchor.text for anchor in friend_anchors]
 
 class RedditSubmission(object):
-    def __init__(self, title, user):
+    def __init__(self, title, user, post_url, link_url):
         self.title = title
         self.user = user
+        self.post_url = post_url
+        self.link_url = link_url
 
 
 def get_user_submissions(username):
@@ -58,10 +60,6 @@ def get_top_posts_from_subreddit(subreddit):
 
 
 def _get_submissions_from_url(url, depth=500):
-    response = requests.get(
-            url,
-            headers = FAKE_HEADERS
-            )
 
     def get_next_link(response):
         possible_link = BeautifulSoup(response.text).find(
@@ -78,9 +76,16 @@ def _get_submissions_from_url(url, depth=500):
         if anchors:
             return ((anchor.text, anchor['href']) for anchor in anchors)
 
+    response = requests.get(
+            url,
+            headers = FAKE_HEADERS
+            )
+
     submission_links = []
 
-    submissions = get_submission_links_and_titles(response.text)
+    submissions = get_submissions(response.text)
+
+    get_post_metadata(response.text)
 
     if submissions is not None:
         submission_links.extend(submissions)
@@ -103,6 +108,22 @@ def _get_submissions_from_url(url, depth=500):
         --depth
 
     return(submission_links)
+
+def get_post_metadata(post_url):
+    """Return a RedditSubmission object from the post_url."""
+    response = requests.get(
+            post_url,
+            headers = FAKE_HEADERS
+            )
+
+def get_submissions_on_page(page_url):
+    """Return all submission links from on page_url."""
+    response = requests.get(
+            page_url,
+            headers = FAKE_HEADERS
+            )
+
+
 
 
 FAKE_HEADERS = {'User-Agent': UserAgent().google}
