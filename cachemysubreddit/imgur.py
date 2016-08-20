@@ -1,8 +1,10 @@
 import re
 import os
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup as _BS
 from urllib.request import urlopen, urlretrieve
 
+def BeautifulSoup(*args, **kwargs):
+    return _BS(*args, 'html.parser', **kwargs)
 
 class Imgur(object):
     def __init__(self, album_url):
@@ -18,7 +20,6 @@ class Imgur(object):
         match = re.search(IMGUR_IMAGE_URL_REGEX, url)
 
         if match:
-            print(url)
             self.album_url = 'http://imgur.com/' + match.group('album_id')
         else:
             raise NotAnImgurAlbumException()
@@ -40,7 +41,6 @@ class Imgur(object):
                 class_='post-image-container')
 
         self.img_urls = [(match['id'], IMGUR_BASE_URL % match['id']) for match in matches]
-        print(self.img_urls)
 
     @staticmethod
     def test_save_exists(folder_path):
@@ -68,7 +68,6 @@ class Imgur(object):
             except:
                 raise
 
-        print(self.img_urls)
         for count, (id_, image_url) in enumerate(self.img_urls):
 
             image_path = os.path.join(

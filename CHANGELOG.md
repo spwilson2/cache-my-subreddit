@@ -4,28 +4,36 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## UNRELEASED
 
+
+## [0.4.0] - 2016-08-20
+### MODIFIED
+- cachemysubreddit/main.py
+  - No longer need the argument -l for login, as auth is done with praw.ini
+- cachemysubreddit/reddit.py
+  - Login and inner workings are ported to praw3. Once reddit no longer supports logins with username and password, will need to rework.
+
 ## [0.3.0] - 2016-08-20
 ### MODIFIED
 - setup.py 
-Changed the entrypoint (program name) to cachemysubreddit (previously typoed to cachemysubbreddit)
+  - Changed the entrypoint (program name) to cachemysubreddit (previously typoed to cachemysubbreddit)
 - develop.sh
-Remove the --download flag to fix problems on other computers
+  - Remove the --download flag to fix problems on other computers
 - cachemysubreddit/main.py
-Adds ability to download a subreddit with option `subreddit and -s <subreddit>`
+  - Adds ability to download a subreddit with option `subreddit and -s <subreddit>`
 - cachemysubreddit/reddit.py
-Adds storage of mangled post titles as the folder name.
+  - Adds storage of mangled post titles as the folder name.
 
 ## [0.2.2] - 2016-04-15
 ### MODIFIED
 - cachemysubreddit/imgur.py
 - cachemysubreddit/main.py
-imgur is not queried if the directories, for which images would be placed in, already exist.
+  - imgur is not queried if the directories, for which images would be placed in, already exist.
 
 
 ## [0.2.1] - 2016-04-12
 ### MODIFIED
 - cachemysubreddit/imgur.py
-If there imgur album was deleted or does not exist don't create a blank folder and don't fail catastrophically.
+  - If there imgur album was deleted or does not exist don't create a blank folder and don't fail catastrophically.
 
 ## [0.2.0] - 2016-04-12
 ### ADDED

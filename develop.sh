@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 clean () {
@@ -14,13 +16,13 @@ clean
 
 else
 
-virtualenv --clear -p /usr/bin/python3 venv --no-site-packages &&
+virtualenv --clear -p /usr/bin/python3 venv --no-site-packages
 
-source venv/bin/activate  &&
+source venv/bin/activate
 
-pip3 install -e $DIR &&
+pip3 install -e $DIR
 
-alias test_package='python $DIR/setup.py test' &&
+alias test_package='python $DIR/setup.py test'
 alias develop='source $DIR/develop.sh' 
 
 if [ $? ]; then printf "

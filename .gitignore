@@ -64,3 +64,4 @@ target/
 
 # Login config
 *.json
+*.ini

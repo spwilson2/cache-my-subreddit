@@ -33,20 +33,25 @@ sudo python3 setup.py install
 To run after instillation or sourcing develop.sh
 
 ```
-cachemysubreddit friend -l <login-config.json> [-p <path to top level directory>]
+cachemysubreddit friends [-p <path to top level directory>]
+
+cachemysubreddit subreddit <subreddit> [-p <path to top level directory>]
+```
+Your login file must be a praw.ini file stored in $HOME/.config/ constructed as follows:
+
+
+```
+[Reddit]
+user: 
+pswd: 
+client_id: 
+client_secret: 
 ```
 
-Your login file must be a json file constructed as follows:
-
-```
-{
-        "user":"reddit username here",
-        "passwd":"reddit password here"
-}
-```
+To get your client_id and client secret go to https://www.reddit.com/prefs/apps/
 
 Make sure to change the permissions after writing the file!
 
 ```
-chmod 400 login-config.json
+chmod 400 praw.ini
 ```

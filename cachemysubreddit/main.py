@@ -6,7 +6,6 @@ from cachemysubreddit.reddit import RedditUser, get_user_submissions, get_top_po
 from cachemysubreddit.imgur import Imgur
 
 _global_test_options = [
-    click.option('-l', '--login', type=click.File('r'), required=True),
     click.option('-p', '--path', type=click.Path(), default='./')
 ]
 
@@ -21,64 +20,60 @@ def cli():
 
 
 @cli.command()
+@click.argument('subreddit')
 @global_test_options
-@click.option('-s', '--subreddit', type=str, required=True)
-def subreddit(login, path, subreddit):
-    credentials = get_login(login)
-    user = RedditUser()
-    user.login(**credentials)
-
-    submissions = get_top_posts_from_subreddit(subreddit)
+def subreddit(path, subreddit):
 
     top_path = os.path.abspath(path)
 
     subreddit_path = clean_for_use_as_path(subreddit)
     subreddit_path = os.path.join(top_path, subreddit_path)
 
-    for title, url in submissions:
+    for submission in get_top_posts_from_subreddit(subreddit):
+        title = submission.title
+        url = submission.url
+        author = submission.author
 
-        title_path = clean_for_use_as_path(title)
-        title_path = os.path.join(subreddit_path, title_path)
+        print('Title: %s\tAuthor: %s' % (title, author))
 
-        if not Imgur.test_save_exists(title_path):
+        title_path  = clean_for_use_as_path(title)
+        author_path = clean_for_use_as_path(author.name)
+
+        main_path = os.path.join(subreddit_path, author_path)
+        main_path = os.path.join(main_path, title_path)
+
+        if not Imgur.test_save_exists(main_path):
             if Imgur.is_imgur_link(url):
-                Imgur(url).save_images(title_path, 'delete')
+                Imgur(url).save_images(main_path, 'delete')
 
 
 @cli.command()
-@click.option('-d', '--daemonize', default=False)
 @global_test_options
-def friend(login, daemonize, path):
-    credentials = get_login(login)
+def friends(path):
     user = RedditUser()
-
 
     top_path = os.path.abspath(path)
 
-    user.login(**credentials)
-    for friend in user.list_friends():
+    user.login()
+
+    for submission in user.friends_submissions():
+        title = submission.title
+        url = submission.url
+        friend = submission.author
+        subreddit = submission.subreddit.display_name
+
+        subreddit_path = clean_for_use_as_path(subreddit)
         friend_path = clean_for_use_as_path(friend.name)
-        friend_path = os.path.join(top_path, friend_path)
+        title_path = clean_for_use_as_path(title)
 
-        submissions = get_user_submissions(friend)
+        main_path = os.path.join(top_path, subreddit_path)
+        main_path = os.path.join(main_path, friend_path)
+        main_path = os.path.join(main_path, title_path)
 
-        for title, url in submissions:
-            print(str(title), str(url))
-
-            title_path = clean_for_use_as_path(title)
-            title_path = os.path.join(friend_path, title_path)
-
-            if not Imgur.test_save_exists(title_path):
-                if Imgur.is_imgur_link(url):
-                    Imgur(url).save_images(title_path, 'delete')
-
-
-def daemon_entry_point(credentials):
-    # TODO
-    pass
-
-def get_login(file_):
-    return json.loads(file_.read())
+        if not Imgur.test_save_exists(main_path):
+            if Imgur.is_imgur_link(url):
+                print('Title: %s\tFriend: %s\tSubreddit: %s' % (title, friend, subreddit))
+                Imgur(url).save_images(main_path, 'delete')
 
 def clean_for_use_as_path(string):
     string = re.sub(r'[^\w\- ]+', '', string)
