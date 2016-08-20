@@ -5,6 +5,15 @@ import os
 from cachemysubreddit.reddit import RedditUser, get_user_submissions, get_top_posts_from_subreddit
 from cachemysubreddit.imgur import Imgur
 
+_global_test_options = [
+    click.option('-l', '--login', type=click.File('r'), required=True),
+    click.option('-p', '--path', type=click.Path(), default='./')
+]
+
+def global_test_options(func):
+    for option in reversed(_global_test_options):
+        func = option(func)
+    return func
 
 @click.group()
 def cli():
@@ -12,8 +21,7 @@ def cli():
 
 
 @cli.command()
-@click.option('-l', '--login', type=click.File('r'), required=True)
-@click.option('-p', '--path', type=click.Path(), default='./')
+@global_test_options
 @click.option('-s', '--subreddit', type=str, required=True)
 def subreddit(login, path, subreddit):
     credentials = get_login(login)
@@ -38,19 +46,18 @@ def subreddit(login, path, subreddit):
 
 
 @cli.command()
-@click.option('-l', '--login', type=click.File('r'), required=True)
 @click.option('-d', '--daemonize', default=False)
-@click.option('-p', '--path', type=click.Path(), default='./')
+@global_test_options
 def friend(login, daemonize, path):
     credentials = get_login(login)
     user = RedditUser()
+
 
     top_path = os.path.abspath(path)
 
     user.login(**credentials)
     for friend in user.list_friends():
-
-        friend_path = clean_for_use_as_path(friend)
+        friend_path = clean_for_use_as_path(friend.name)
         friend_path = os.path.join(top_path, friend_path)
 
         submissions = get_user_submissions(friend)

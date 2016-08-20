@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "cachemysubreddit",
-    version = "0.3.0",
+    version = "0.3.1_dev",
     packages = find_packages(),
 
     install_requires = ['praw', 'click', 'requests', 'fake-useragent', 'bs4',

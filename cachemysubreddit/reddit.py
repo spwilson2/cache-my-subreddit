@@ -3,6 +3,10 @@ from time import sleep
 import re
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup as _B
+import praw
+
+USER_AGENT='sheenrocks\' user agent'
+REDDIT_SITE='Reddit'
 
 def BeautifulSoup(*args, **kwargs):
     return _B(*args, 'html.parser', **kwargs)
@@ -15,6 +19,11 @@ class RedditUser(object):
 
     def login(self, user, passwd):
         """Log in to reddit using the given credentials."""
+        self.reddit = praw.Reddit(user_agent=USER_AGENT, site_name=REDDIT_SITE)
+
+        self.reddit.login() # DEPRECATED careful about keeping.
+        self.reddit.get_submissions
+
         response = requests.post(
                 'https://www.reddit.com/api/login',
                 {'user': user, 'passwd': passwd},
@@ -23,17 +32,20 @@ class RedditUser(object):
         self.cookies = response.cookies
 
     def list_friends(self):
-        """Return a list of friend's usernames."""
-        response = self.get_url( 'https://www.reddit.com/prefs/friends/')
+        print(self.reddit.get_friends())
+        return self.reddit.get_friends() # Deprecated
 
-        friends_bsobj = BeautifulSoup(response.text)
+    #    """Return a list of friend's usernames."""
+    #    response = self.get_url( 'https://www.reddit.com/prefs/friends/')
 
-        assert(friends_bsobj.find('table'))
+    #    friends_bsobj = BeautifulSoup(response.text)
 
-        friend_anchors = friends_bsobj.find('table').find_all('a',
-              href=re.compile('^https://www.reddit.com/user/[^/]*/$'))
+    #    assert(friends_bsobj.find('table'))
 
-        return [anchor.text for anchor in friend_anchors]
+    #    friend_anchors = friends_bsobj.find('table').find_all('a',
+    #          href=re.compile('^https://www.reddit.com/user/[^/]*/$'))
+
+    #    return [anchor.text for anchor in friend_anchors]
 
     def get_url(self, url):
         """Return the response from getting the url as the signed in user."""
@@ -43,13 +55,10 @@ class RedditUser(object):
             headers=FAKE_HEADERS
         )
 
+    def friends_submissions():
+        for friend in self.list_friends():
+            print(friend.get_submitted(limit=1000))
 
-class RedditSubmission(object):
-    def __init__(self, title, user, post_url, link_url):
-        self.title = title
-        self.user = user
-        self.post_url = post_url
-        self.link_url = link_url
 
 
 def get_user_submissions(username):
