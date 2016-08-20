@@ -16,6 +16,10 @@ def cli():
 @click.option('-p', '--path', type=click.Path(), default='./')
 @click.option('-s', '--subreddit', type=str, required=True)
 def subreddit(login, path, subreddit):
+    credentials = get_login(login)
+    user = RedditUser()
+    user.login(**credentials)
+
     submissions = get_top_posts_from_subreddit(subreddit)
 
     top_path = os.path.abspath(path)
@@ -52,6 +56,7 @@ def friend(login, daemonize, path):
         submissions = get_user_submissions(friend)
 
         for title, url in submissions:
+            print(str(title), str(url))
 
             title_path = clean_for_use_as_path(title)
             title_path = os.path.join(friend_path, title_path)

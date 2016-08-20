@@ -9,8 +9,9 @@ Changed the entrypoint (program name) to cachemysubreddit (previously typoed to 
 - develop.sh
 Remove the --download flag to fix problems on other computers
 - cachemysubreddit/main.py
-- cachemysubreddit/reddit.py
 Adds ability to download a subreddit with option `subreddit and -s <subreddit>`
+- cachemysubreddit/reddit.py
+Adds storage of mangled post titles as the folder name.
 
 ## [0.2.2] - 2016-04-15
 ### MODIFIED
