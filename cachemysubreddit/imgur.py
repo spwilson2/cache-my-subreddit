@@ -66,7 +66,7 @@ class Imgur(object):
             try:
                 os.makedirs(folder_path)
             except:
-                raise
+                pass
 
         for count, (id_, image_url) in enumerate(self.img_urls):
 

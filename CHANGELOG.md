@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## UNRELEASED
 
 
+## [0.4.1] - 2016-08-20
+### MODIFIED
+- cachemysubreddit/imgur.py
+ - Hotfix to fix attempts to remake directories.
+
 ## [0.4.0] - 2016-08-20
 ### MODIFIED
 - cachemysubreddit/main.py
