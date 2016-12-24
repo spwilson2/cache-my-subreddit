@@ -10,20 +10,34 @@ from cms.database import Database
 
 CHAR_WHITELIST = r'\w,.\- '
 
+_download_options = [
+		click.option('-c', '--config', type=click.Path(), default='./login.ini', help='Path of the config file.'),
+		click.option('-o', '--output', type=click.Path(), default='./output', help='Dir to output all files to.'),
+		click.option('-d', '--databasedir', type=click.Path(), default='./output', help='Dir to place the sqlite database in.'),
+        click.option('-n', '--number', type=click.INT, default=10, help='The number of posts to download.'),
+]
+
+def _add_options(options):
+    def __add_options(func):
+        for option in reversed(options):
+            func = option(func)
+        return func
+    return __add_options
+
+
 @click.group()
 def cli():
     pass
 
 @cli.command()
-@click.option('-c', '--config', type=click.Path(), default='./login.ini')
+@click.option('-c', '--config', type=click.Path(), default='./login.ini', help='Path of the config file.')
 def config(config):
     write_oauth_info(config)
 
 @cli.command()
-@click.option('-s', '--subreddit', type=click.STRING)
-@click.option('-c', '--config', type=click.Path(), default='./login.ini')
-@click.option('-o', '--output', type=click.Path(), default='./output')
-def subreddit(output, config, subreddit):
+@click.option('-s', '--subreddit', type=click.STRING, help='Subreddit to download top posts from.')
+@_add_options(_download_options)
+def subreddit(output, number, config, subreddit, databasedir):
 
     client_id, client_secret, username, password =\
     read_oauth_info(config)
@@ -34,16 +48,15 @@ def subreddit(output, config, subreddit):
             username=username,
             password=password)
 
-    database = Database()
+    database = Database(databasedir)
 
-    for submission in r.subreddit_submissions(subreddit, limit=30):
+    for submission in r.subreddit_submissions(subreddit, limit=number):
         save(submission, database, basedir=output)
 
 
 @cli.command()
-@click.option('-c', '--config', type=click.Path(), default='./login.ini')
-@click.option('-o', '--output', type=click.Path(), default='./output')
-def friends(output, config):
+@_add_options(_download_options)
+def friends(output, config, databasedir, number):
     client_id, client_secret, username, password =\
     read_oauth_info(config)
 
@@ -55,13 +68,13 @@ def friends(output, config):
 
     friends = r.list_friends()
 
-    database = Database()
+    database = Database(databasedir)
 
     for friend in friends:
         print('==================================================================')
         print('Downloading uploads for %s' % friend)
         print('==================================================================')
-        for submission in r.user_submissions(friend):
+        for submission in r.user_submissions(friend, limit=number):
             save(submission, database, basedir=output)
 
 

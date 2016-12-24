@@ -7,12 +7,14 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.sqlite import DATETIME
 from sqlalchemy.orm import sessionmaker
 
+DATABASE_NAME = 'database.sqlite3'
 
 class Database(object):
-    def __init__(self, path='./output/database.sqlite3'):
-        database_dir = os.path.dirname(path)
+    def __init__(self, database_dir='./output'):
         if not os.path.exists(database_dir):
             os.makedirs(database_dir)
+
+        path = os.path.join(database_dir, DATABASE_NAME)
 
         self.engine = sqlalchemy.create_engine('sqlite:///'+path, module=sqlite, echo=False)
         self.Sessionmaker = sessionmaker(bind=self.engine)

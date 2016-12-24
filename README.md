@@ -20,7 +20,8 @@ To run the all unit tests use the alias `test_package` which is  provided after 
 
 ## Installation
 
-To install simply clone and use the setuptools setup.py.
+To install simply clone, use the setuptools setup.py.
+Note: Also requires sqlite for database support.
 
 ```
 git clone https://github.com/spwilson2/cache-my-subreddit

@@ -5,7 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## UNRELEASED
 
 ## TODO
-- Optimize the parsing use a .find loop rather than multiple find_all.
+- Optimize the parsing use a .find loop rather than multiple find\_all.
+
+## [0.5.1] - 2016-12-24
+### ADDED
+- subreddit and friends options take --number flag to allow limit setting for downloads.
 
 ## [0.5.0] - 2016-12-24
 ### ADDED

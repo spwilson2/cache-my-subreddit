@@ -76,7 +76,11 @@ class Reddit(object):
     def subreddit_submissions(self, subreddit, limit=10):
         listings = self._reddit.subreddit(subreddit).hot()
         listings.limit = limit
+        count = 0
         for listing in listings:
+            count += 1
+            if count > limit:
+                return
             yield Post.wrap(listing)
 
     def user_submissions(self, user, limit=10000):
@@ -84,7 +88,7 @@ class Reddit(object):
         submissions = self._submissions(SUBMITTED_FMT % user)
         for submission in submissions:
             count += 1
-            if count >= limit:
+            if count > limit:
                 return
             yield submission
 
