@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## TODO
 - Logs
   - Save: User, Title, Subreddit, Post Url, Link Url, Date Done, Path Saved
+- Optimize the parsing use a .find loop rather than find_all.
 
 ### MODFIED
 - cachemysubreddit/

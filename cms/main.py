@@ -8,30 +8,41 @@ import cms.reddit
 from cms.config import read_oauth_info, write_oauth_info
 
 CHAR_WHITELIST = r'\w,.\- '
-_global_test_options = [
-    click.option('-o', '--output', type=click.Path(), default='./output'),
-    click.option('-c', '--config', type=click.Path(), default='./login.ini')
-]
-
-def global_test_options(func):
-    for option in reversed(_global_test_options):
-        func = option(func)
-    return func
 
 @click.group()
 def cli():
     pass
 
 @cli.command()
-@global_test_options
-def config(output, config):
+@click.option('-c', '--config', type=click.Path(), default='./login.ini')
+def config(config):
     write_oauth_info(config)
 
 @cli.command()
-@global_test_options
+@click.option('-s', '--subreddit', type=click.STRING)
+@click.option('-c', '--config', type=click.Path(), default='./login.ini')
+@click.option('-o', '--output', type=click.Path(), default='./output')
+def subreddit(output, config, subreddit):
+
+    client_id, client_secret, username, password =\
+    read_oauth_info(config)
+
+    r = cms.reddit.Reddit(
+            client_id=client_id,
+            client_secret=client_secret,
+            username=username,
+            password=password)
+
+    for submission in r.subreddit_submissions(subreddit, limit=30):
+        save(submission, basedir=output)
+
+
+@cli.command()
+@click.option('-c', '--config', type=click.Path(), default='./login.ini')
+@click.option('-o', '--output', type=click.Path(), default='./output')
 def friends(output, config):
     client_id, client_secret, username, password =\
-    read_oauth_info()
+    read_oauth_info(config)
 
     r = cms.reddit.Reddit(
             client_id=client_id,
@@ -45,8 +56,8 @@ def friends(output, config):
         print('==================================================================')
         print('Downloading uploads for %s' % friend)
         print('==================================================================')
-        for submission in r.submissions(friend):
-            save(submission, basedir=path)
+        for submission in r.user_submissions(friend):
+            save(submission, basedir=output)
 
 
 def clean_for_use_as_path(string):
@@ -59,7 +70,7 @@ def save(submission, basedir='output'):
 
     # subreddit/user/PostName
     clean_title = clean_for_use_as_path(submission.title)
-    savedir = os.path.join(basedir, submission.subreddit, submission.redditor, clean_title)
+    savedir = os.path.join(basedir, submission.subreddit, submission.author, clean_title)
 
 
     if not os.path.exists(savedir):
@@ -70,7 +81,7 @@ def save(submission, basedir='output'):
         return
 
     print('Title: %-30s\tFriend: %-15s\tSubreddit: %-15s' %
-            (submission.title, submission.redditor, submission.subreddit))
+            (submission.title, submission.author, submission.subreddit))
 
     if cms.imgur.Imgur.is_link(submission.url):
         cms.imgur.Imgur(submission.url).save(savedir,pfx='Post')
