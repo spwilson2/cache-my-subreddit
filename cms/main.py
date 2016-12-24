@@ -6,6 +6,7 @@ import click
 import cms.imgur
 import cms.reddit
 from cms.config import read_oauth_info, write_oauth_info
+from cms.database import Database
 
 CHAR_WHITELIST = r'\w,.\- '
 
@@ -33,8 +34,10 @@ def subreddit(output, config, subreddit):
             username=username,
             password=password)
 
+    database = Database()
+
     for submission in r.subreddit_submissions(subreddit, limit=30):
-        save(submission, basedir=output)
+        save(submission, database, basedir=output)
 
 
 @cli.command()
@@ -52,12 +55,14 @@ def friends(output, config):
 
     friends = r.list_friends()
 
+    database = Database()
+
     for friend in friends:
         print('==================================================================')
         print('Downloading uploads for %s' % friend)
         print('==================================================================')
         for submission in r.user_submissions(friend):
-            save(submission, basedir=output)
+            save(submission, database, basedir=output)
 
 
 def clean_for_use_as_path(string):
@@ -65,26 +70,25 @@ def clean_for_use_as_path(string):
     string = re.sub(r'[ ]+', '_', string) # Replace spaces with _
     return string
 
-def save(submission, basedir='output'):
+def save(submission, database, basedir='output'):
     basedir = os.path.dirname(os.path.abspath(__file__)) if basedir is None else basedir
 
     # subreddit/user/PostName
     clean_title = clean_for_use_as_path(submission.title)
     savedir = os.path.join(basedir, submission.subreddit, submission.author, clean_title)
 
-
-    if not os.path.exists(savedir):
-        os.makedirs(savedir)
-    else:
-        # If dir is made, assume save already exists.
-        print('%s already exists, skipping...' % submission.title)
-        return
-
     print('Title: %-30s\tFriend: %-15s\tSubreddit: %-15s' %
             (submission.title, submission.author, submission.subreddit))
 
     if cms.imgur.Imgur.is_link(submission.url):
-        cms.imgur.Imgur(submission.url).save(savedir,pfx='Post')
+        if not os.path.exists(savedir):
+            os.makedirs(savedir)
+        else:
+            # If dir is made, assume save already exists.
+            print('%s already exists, skipping...' % submission.title)
+            return
+        images = cms.imgur.Imgur(submission.url).save(savedir,pfx='Post')
+        database.add_post(submission, images, savedir)
 
 if __name__ == '__main__':
     friends('./')

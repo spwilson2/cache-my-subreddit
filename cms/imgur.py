@@ -56,7 +56,7 @@ class Imgur(object):
 
         # If there weren't any images to download, return
         if not self.img_urls:
-            return
+            return 0
 
         folder= os.path.abspath(folder)
 
@@ -74,6 +74,8 @@ class Imgur(object):
                 raise BadPathException('%s already exists.' % dl_path)
             else:
                 _download(image_url, dl_path)
+
+        return count
 
 def _download(url, path):
     r = requests.get(url, stream=True)

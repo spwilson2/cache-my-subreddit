@@ -5,13 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## UNRELEASED
 
 ## TODO
-- Logs
-  - Save: User, Title, Subreddit, Post Url, Link Url, Date Done, Path Saved
-- Optimize the parsing use a .find loop rather than find_all.
+- Optimize the parsing use a .find loop rather than multiple find_all.
+
+## [0.5.0] - 2016-12-24
+### ADDED
+- Addded a database for entries and their saved file paths.
 
 ### MODFIED
 - cachemysubreddit/
   - Renamed to cms/
+
 ### REWRITTEN
 - cms/imgur.py
   - Changed to requests only api, less likey to run into port issues.
@@ -23,7 +26,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   - Changed to use praw-4.0 
   - Refactored submitted code
 
-## [0.5.0] - 2016-12-24
 ## [0.4.1] - 2016-08-20
 ### MODIFIED
 - cachemysubreddit/imgur.py
