@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## TODO
 - Optimize the parsing use a .find loop rather than multiple find\_all.
+- Bring back support for reading list of all friends rather than through praw.
+
+## [0.5.2] - 2016-13-24
+### BUGFIX
+- friends functionality fixed
+  - Caused by inability to find friend name by parsing on submitted links
 
 ## [0.5.1] - 2016-12-24
 ### ADDED

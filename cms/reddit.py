@@ -63,12 +63,12 @@ class Reddit(object):
         for friend in friends:
             yield friend.name
 
-    def _submissions(self, url, limit=10000):
+    def _submissions(self, url, user=None):
         next_submitted_url = url
         while next_submitted_url:
             submissions_html = self._get_url(next_submitted_url).text
             bs_obj = BeautifulSoup(submissions_html)
-            submissions = _get_metadata(bs_obj)
+            submissions = _get_metadata(bs_obj, user)
             for submission in submissions:
                 yield submission
             next_submitted_url = _get_next_link(bs_obj)
@@ -85,7 +85,7 @@ class Reddit(object):
 
     def user_submissions(self, user, limit=10000):
         count = 0
-        submissions = self._submissions(SUBMITTED_FMT % user)
+        submissions = self._submissions(SUBMITTED_FMT % user, user)
         for submission in submissions:
             count += 1
             if count > limit:
@@ -110,12 +110,19 @@ def _get_next_link(bs_obj):
     if possible_link is not None:
         return possible_link['href']
 
+class LinkParser(object):
+    def __init__(self):
+        pass
 
-def _get_metadata(bs_obj):
+
+
+def _get_metadata(bs_obj, user=None):
     title_link_url_anchors = None
 
 
-    user_anchors = bs_obj.find_all('a', class_="author friend may-blank")
+    if user is None:
+        user_anchors = bs_obj.find_all('a', class_="author friend may-blank")
+
     subreddit_anchors = bs_obj.find_all('a', class_="subreddit hover may-blank")
     post_url_anchors = bs_obj.find_all('a', class_="bylink comments may-blank")
     title_link_url_anchors = bs_obj.find_all('a', class_="title may-blank outbound")
@@ -124,9 +131,12 @@ def _get_metadata(bs_obj):
 
     # (title, url) generator
     titles_links = ((anchor.text, anchor['href']) for anchor in title_link_url_anchors)
-    post_urls = (anchor.text for anchor in post_url_anchors)
+    post_urls = [anchor.text for anchor in post_url_anchors]
     subreddits = (anchor.text[3:].replace('/','') for anchor in subreddit_anchors)
-    users = (anchor.text for anchor in user_anchors)
+    if user is None:
+        users = (anchor.text for anchor in user_anchors)
+    else:
+        users = (user for _ in post_urls)
 
     metadata_list = []
 
