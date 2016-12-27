@@ -6,6 +6,7 @@ import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.sqlite import DATETIME
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import exists
 
 DATABASE_NAME = 'database.sqlite3'
 
@@ -64,3 +65,8 @@ class Database(object):
                 path)
         )
         self.session.commit()
+
+    def exists(self, post):
+        return self.session.query(exists().where(self.PostORM.author==post.author)
+                .where(self.PostORM.title==post.title)
+                .where(self.PostORM.subreddit==post.subreddit)).scalar()

@@ -3,7 +3,7 @@ import re
 
 import click
 
-import cms.imgur
+import cms.downloader
 import cms.reddit
 from cms.config import read_oauth_info, write_oauth_info
 from cms.database import Database
@@ -86,22 +86,30 @@ def clean_for_use_as_path(string):
 def save(submission, database, basedir='output'):
     basedir = os.path.dirname(os.path.abspath(__file__)) if basedir is None else basedir
 
-    # subreddit/user/PostName
-    clean_title = clean_for_use_as_path(submission.title)
-    savedir = os.path.join(basedir, submission.subreddit, submission.author, clean_title)
+    if database.exists(submission):
+        print('%s already exists, skipping...' % submission.title)
+        return
 
+    # Download files if have a suitable downloader...
+    downloader = cms.downloader.UniversalDownloader(submission.url).downloader
+    images = 0
+    savedir = ''
+    if downloader:
+
+        # subreddit/user/PostName
+        clean_title = clean_for_use_as_path(submission.title)
+        savedir = os.path.join(basedir, submission.subreddit, submission.author, clean_title)
+
+        if os.path.exists(savedir):
+            pass
+        else:
+            os.makedirs(savedir)
+        images = downloader.save(savedir,pfx='Post')
+
+    # Add the file to our database.
     print('Title: %-30s\tFriend: %-15s\tSubreddit: %-15s' %
             (submission.title, submission.author, submission.subreddit))
-
-    if cms.imgur.Imgur.is_link(submission.url):
-        if not os.path.exists(savedir):
-            os.makedirs(savedir)
-        else:
-            # If dir is made, assume save already exists.
-            print('%s already exists, skipping...' % submission.title)
-            return
-        images = cms.imgur.Imgur(submission.url).save(savedir,pfx='Post')
-        database.add_post(submission, images, savedir)
+    database.add_post(submission, images, savedir)
 
 if __name__ == '__main__':
     friends('./')

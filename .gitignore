@@ -65,3 +65,6 @@ target/
 # Login config
 *.json
 *.ini
+
+# Our stuff
+output
