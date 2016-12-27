@@ -11,6 +11,10 @@ IMGUR_FMT_URL = 'http://i.imgur.com/%s.jpg'
 
 GFYCAT_URL_REGEX = r'^https?\:\/\/(www\.)?gfycat\.com/[a-zA-Z0-9]+$'
 
+EROSHARE_URL_REGEX = r'^https?\:\/\/(www\.)?eroshare\.com/[a-zA-Z0-9#]+$'
+EROSHARE_ID_REGEX = re.compile(r'player-(?P<id>\w+)')
+EROSHARE_FMT_URL = 'https://v.eroshare.com/%s.mp4'
+
 class DownloaderBase(object):
     def __init__(self, album_url):
         # Get album actual url
@@ -117,10 +121,46 @@ class Imgur(DownloaderBase):
 
         self._initialized = True
 
+
+class EroShare(DownloaderBase):
+    url_regex = EROSHARE_URL_REGEX
+
+    def __init__(self, album_url):
+        # Get album actual url
+        self._init_link(album_url)
+        self._initialized = False
+
+    def _init_link(self, url):
+        match = re.search(EroShare.url_regex, url)
+        if match:
+            self.album_url = url
+        else:
+            raise UnsupportedLinkException()
+
+    def _init_images(self):
+        try:
+            response = requests.get(self.album_url)
+        except Exception:
+            print("Didn't find:", str(self.album_url))
+            self.img_urls = []
+            return
+
+        # Read in the images now so we can get stats and stuff:
+        response_bs = BeautifulSoup(response.text)
+        match = response_bs.find('video')
+        self.img_urls = None
+        if match:
+            id_ = EROSHARE_ID_REGEX.search(match['id']).groupdict()['id']
+            print(id_)
+            self.img_urls = [(id_, EROSHARE_FMT_URL % id_)]
+
+        self._initialized = True
+
+
 class UniversalDownloader(object):
     def __init__(self, album_url):
         self.downloader = None
-        for downloader in [Imgur, Gfycat]:
+        for downloader in [Imgur, Gfycat, EroShare]:
             if downloader.is_link(album_url):
                 self.downloader = downloader(album_url)
                 return
@@ -134,9 +174,10 @@ def _download(url, path):
                 f.write(chunk)
 
 if __name__ == '__main__':
-    url = 'https://gfycat.com/ClearWindyAiredale'
+    url = 'https://eroshare.com/pibgaw80#'
     savedir = 'output'
-    if Gfycat.is_link(url):
+    downloader = UniversalDownloader(url).downloader
+    if downloader:
         if not os.path.exists(savedir):
             os.makedirs(savedir)
-        images = Gfycat(url).save(savedir,pfx='Post')
+        downloader.save(savedir, pfx='Post')
