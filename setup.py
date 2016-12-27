@@ -5,7 +5,7 @@ setup(
     version = "0.5.2",
     packages = find_packages(),
 
-    install_requires = ['praw', 'bs4', 'requests', 'click', 'fake_useragent', 'sqlalchemy'],
+    install_requires = ['praw', 'bs4', 'requests', 'click', 'fake_useragent', 'sqlalchemy', 'lxml'],
     include_package_data = True,
 
     entry_points="""

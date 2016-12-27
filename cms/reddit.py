@@ -110,39 +110,109 @@ def _get_next_link(bs_obj):
     if possible_link is not None:
         return possible_link['href']
 
-class LinkParser(object):
-    def __init__(self):
-        pass
+class _ClassParser(object):
+    RE_EXTENDER = '(?P<%s>%s)'
+    class _ClassParserRegex(object):
 
+        def __init__(self, class_regex, callback):
+            self.class_regex = class_regex
+            self.compiled_regex = re.compile(class_regex)
+            self.callback = callback
+
+        def do_if_match(self, bs_match):
+            if self._compiled_regex.search(bs_match.class_):
+                return self.callback(bs_match)
+
+    def __init__(self, bs_obj):
+        self.bs_obj = bs_obj
+        self.regex = ''
+        self.compiled_re = None
+
+        self.parsers = {}
+        self.parsers_counter = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return self.next()
+
+    def next(self):
+        vals = []
+        for _ in range(len(self.parsers)):
+            vals.append(self.bs_parse())
+        if len(vals) != len(self.parsers):
+            raise StopIteration
+        else:
+            return vals
+
+    def bs_parse(self):
+        match = str(self.bs_obj.find_next('a', self.regex))
+        re_match = self.compiled_re.search(match)
+        if re_match:
+            print(re_match)
+            print(re_match.groupdict())
+            return re_self.parsers[re_match.groupdict().keys()[0]].do_if_match(match)
+
+    def compile(self):
+        self.compiled_re = re.compile(self.regex)
+
+    def add(self, class_regex, callback, name):
+        self.parsers[name] = class_regex
+        self.regex += _ClassParser.RE_EXTENDER % (name, class_regex)
 
 
 def _get_metadata(bs_obj, user=None):
     title_link_url_anchors = None
 
+    class_parser = _ClassParser(bs_obj)
+
+    subreddit_parser = class_parser.add("subreddit hover may-blank",
+            lambda bs_match: anchor.text[3:].replace('/',''),
+            name='subreddit')
+
+    post_parser = class_parser.add("bylink comments may-blank",
+            lambda bs_match: bs_match.text,
+            name='name')
+
+    title_link_parser = class_parser.add("title may-blank outbound",
+            lambda bs_match: (bs_match.text, bs_match['href']),
+            name='title_link')
 
     if user is None:
-        user_anchors = bs_obj.find_all('a', class_="author friend may-blank")
+        user_anchors_parser = class_parser.add("title may-blank outbound",
+                lambda bs_match: bs_match.text,
+                name='user')
 
-    subreddit_anchors = bs_obj.find_all('a', class_="subreddit hover may-blank")
-    post_url_anchors = bs_obj.find_all('a', class_="bylink comments may-blank")
-    title_link_url_anchors = bs_obj.find_all('a', class_="title may-blank outbound")
-    if not title_link_url_anchors:
-        title_link_url_anchors = bs_obj.find_all('a', class_="title may-blank loggedin outbound")
+    class_parser.compile()
+
+    #if user is None:
+    #    user_anchors = bs_obj.find_all('a', class_="author friend may-blank")
+
+    for submission in class_parser:
+        print(submission)
+        yield submission
+
+    #subreddit_anchors = bs_obj.find_all('a', class_="subreddit hover may-blank")
+    #subreddits = (anchor.text[3:].replace('/','') for anchor in subreddit_anchors)
+
+    #post_url_anchors = bs_obj.find_all('a', class_="bylink comments may-blank")
+    #post_urls = [anchor.text for anchor in post_url_anchors]
+
+    #title_link_url_anchors = bs_obj.find_all('a', class_="title may-blank outbound")
+    #if not title_link_url_anchors:
+    #    title_link_url_anchors = bs_obj.find_all('a', class_="title may-blank loggedin outbound")
 
     # (title, url) generator
-    titles_links = ((anchor.text, anchor['href']) for anchor in title_link_url_anchors)
-    post_urls = [anchor.text for anchor in post_url_anchors]
-    subreddits = (anchor.text[3:].replace('/','') for anchor in subreddit_anchors)
-    if user is None:
-        users = (anchor.text for anchor in user_anchors)
-    else:
-        users = (user for _ in post_urls)
+    #titles_links = ((anchor.text, anchor['href']) for anchor in title_link_url_anchors)
+    #if user is None:
+    #    users = (anchor.text for anchor in user_anchors)
+    #else:
+    #    users = (user for _ in post_urls)
 
-    metadata_list = []
-
-    for submission in zip(titles_links, post_urls, subreddits, users):
-        (title, link_url), post_url, post_subreddit, user = submission
-        metadata_list.append(Post(title, user, link_url, post_url, post_subreddit))
+    #for submission in zip(titles_links, post_urls, subreddits, users):
+    #    (title, link_url), post_url, post_subreddit, user = submission
+    #    yield Post(title, user, link_url, post_url, post_subreddit)
 
     #subreddit:
     #   <a href="https://www.reddit.com/r/GoneMild/" class="subreddit hover may-blank">/r/GoneMild</a>
@@ -152,7 +222,6 @@ def _get_metadata(bs_obj, user=None):
 
     #link_url:
     #   <a class="title may-blank loggedin outbound" data-event-action="title" href="http://i.imgur.com/fnXnhfK.jpg" tabindex="1" data-href-url="http://i.imgur.com/fnXnhfK.jpg" data-outbound-url="https://out.reddit.com/t3_5jn5ao?url=http%3A%2F%2Fi.imgur.com%2FfnXnhfK.jpg&amp;token=AQAAq-ZdWMcR1gXU5EWru4O3HuYimaam0xNWwa2a_pGd08Drf1wN&amp;app_name=reddit.com" data-outbound-expiration="1482548907000" rel="">About to work out :)</a>
-    return metadata_list
 
 if __name__ == '__main__':
     val = requests.get('https://www.reddit.com/r/AskReddit/').text

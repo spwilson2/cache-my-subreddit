@@ -35,9 +35,10 @@ def config(config):
     write_oauth_info(config)
 
 @cli.command()
-@click.option('-s', '--subreddit', type=click.STRING, help='Subreddit to download top posts from.')
+@click.option('-s', '--subreddits', type=click.STRING, multiple=True,
+        help='Subreddits to download top posts from (use flag multiple times).')
 @_add_options(_download_options)
-def subreddit(output, number, config, subreddit, databasedir):
+def subreddit(output, number, config, subreddits, databasedir):
 
     client_id, client_secret, username, password =\
     read_oauth_info(config)
@@ -50,8 +51,9 @@ def subreddit(output, number, config, subreddit, databasedir):
 
     database = Database(databasedir)
 
-    for submission in r.subreddit_submissions(subreddit, limit=number):
-        save(submission, database, basedir=output)
+    for subreddit in subreddits:
+        for submission in r.subreddit_submissions(subreddit, limit=number):
+            save(submission, database, basedir=output)
 
 
 @cli.command()

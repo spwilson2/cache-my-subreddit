@@ -4,7 +4,7 @@ from fake_useragent import UserAgent
 _FAKE_HEADERS = {'User-Agent': UserAgent().google}
 
 def BeautifulSoup(*args, **kwargs):
-    parser = 'html.parser'
+    parser = 'lxml'
     return _B(args[0], parser, **kwargs)
 
 class UnsupportedLinkException(Exception):
