@@ -35,7 +35,7 @@ def config(config):
     write_oauth_info(config)
 
 @cli.command()
-@click.option('-s', '--subreddit', type=click.STRING, help='Subreddit to download top posts from.')
+@click.argument('subreddit', type=click.STRING)
 @_add_options(_download_options)
 def subreddit(output, number, config, subreddit, databasedir):
 

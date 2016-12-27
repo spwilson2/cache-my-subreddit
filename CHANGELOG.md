@@ -8,6 +8,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Optimize the parsing use a .find loop rather than multiple find\_all.
 - Bring back support for reading list of all friends rather than through praw.
 
+## [0.5.4] - 2016-12-27
+### MODIFIED
+- cms/main.py
+  - Change subreddit argument to required, rather than option.
+
 ## [0.5.3] - 2016-12-27
 ### MODIFIED
 - cms/main.py
