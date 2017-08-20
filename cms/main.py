@@ -2,6 +2,7 @@ import os
 import re
 
 import click
+import requests
 
 import cms.downloader
 import cms.reddit
@@ -95,7 +96,8 @@ def user(output, databasedir, number, username):
 def clean_for_use_as_path(string):
     string = re.sub(r'[^%s]' % CHAR_WHITELIST, '-', string)
     string = re.sub(r'[ ]+', '_', string) # Replace spaces with _
-    return string
+    # Shorten the title so the path is reasonable.
+    return string[:60]
 
 def save(submission, database, basedir='output'):
     basedir = os.path.dirname(os.path.abspath(__file__)) if basedir is None else basedir
@@ -118,12 +120,26 @@ def save(submission, database, basedir='output'):
             pass
         else:
             os.makedirs(savedir)
-        images = downloader.save(savedir,pfx='Post')
 
-    # Add the file to our database.
-    print('Title: %-30s\tFriend: %-15s\tSubreddit: %-15s' %
-            (submission.title, submission.author, submission.subreddit))
-    database.add_post(submission, images, savedir)
+        # Number of retries to download
+        for _ in range(3):
+            try:
+                images = downloader.save(savedir,pfx='Post')
+            except requests.exceptions.ConnectionError:
+                # Retry again if failed to connect
+                pass
+            else:
+                break
+        else:
+            # We failed the allotted number of times don't add it to the
+            # database.
+            print('Unable to reach the destination of %s, skipping...' % submission.title)
+            return
+
+        # Add the file to our database.
+        print('Title: %-30s\tFriend: %-15s\tSubreddit: %-15s' %
+                (submission.title, submission.author, submission.subreddit))
+        database.add_post(submission, images, savedir)
 
 if __name__ == '__main__':
     friends('./')

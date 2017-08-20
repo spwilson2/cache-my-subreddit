@@ -15,6 +15,8 @@ EROSHARE_URL_REGEX = r'^https?\:\/\/(www\.)?eroshare\.com/[a-zA-Z0-9#]+$'
 EROSHARE_ID_REGEX = re.compile(r'player-(?P<id>\w+)')
 EROSHARE_FMT_URL = 'https://v.eroshare.com/%s.mp4'
 
+GLOB_ALL = re.compile('.?')
+
 class DownloaderBase(object):
     def __init__(self, album_url):
         # Get album actual url
@@ -51,7 +53,8 @@ class DownloaderBase(object):
             dl_path = os.path.join(folder, pfx+sfx+count+file_ext)
 
             if os.path.exists(dl_path):
-                raise BadPathException('%s already exists.' % dl_path)
+                # We explicitily print instead of raise.
+                print(BadPathException('%s already exists.' % dl_path))
             else:
                 _download(image_url, dl_path)
 
@@ -80,6 +83,11 @@ class Gfycat(DownloaderBase):
         # Read in the images now so we can get stats and stuff:
         response_bs = BeautifulSoup(response.text)
         match = response_bs.find(id='share-video')
+        if match is None:
+            print("Didn't find:", str(self.album_url))
+            self.img_urls = []
+            return
+
         match = match.find('source', type=re.compile('type/(mp4)|(webm)|(jpg)'))
         if match:
             self.img_urls = [(os.path.basename(match['src']), match['src'])]
@@ -115,7 +123,14 @@ class Imgur(DownloaderBase):
                 id=re.compile('[a-zA-Z0-9]+'),
                 class_='post-image-container')
 
-        self.img_urls = [(match['id'], IMGUR_FMT_URL % match['id']) for match in matches]
+        # Get the src tag from each post-image-container.
+        self.img_urls = []
+        for match in matches:
+            source = match.find(src=GLOB_ALL)
+            if source:
+                source = source.get('src')
+                if source:
+                    self.img_urls.append((match['id'], 'http://' + source.lstrip('/')))
 
         self._initialized = True
 
