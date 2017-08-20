@@ -8,6 +8,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Optimize the parsing use a .find loop rather than multiple find\_all.
 - Bring back support for reading list of all friends rather than through praw.
 
+## [0.5.6] - 2017-8-19
+### MODIFIED
+- Fix subreddit names for reddit's new shortened urls
+- Fix download for updated gyfcat
+
 ## [0.5.5] - 2016-12-27
 ### ADDED
 - Support for EroShare

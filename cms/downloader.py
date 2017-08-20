@@ -79,10 +79,8 @@ class Gfycat(DownloaderBase):
 
         # Read in the images now so we can get stats and stuff:
         response_bs = BeautifulSoup(response.text)
-        match = response_bs.find(
-                'video',
-                id='share-video')
-        match = match.find('source', type=re.compile('type/(mp4)|(webm)'))
+        match = response_bs.find(id='share-video')
+        match = match.find('source', type=re.compile('type/(mp4)|(webm)|(jpg)'))
         if match:
             self.img_urls = [(os.path.basename(match['src']), match['src'])]
 
@@ -151,7 +149,6 @@ class EroShare(DownloaderBase):
         self.img_urls = None
         if match:
             id_ = EROSHARE_ID_REGEX.search(match['id']).groupdict()['id']
-            print(id_)
             self.img_urls = [(id_, EROSHARE_FMT_URL % id_)]
 
         self._initialized = True

@@ -132,7 +132,9 @@ def _get_metadata(bs_obj, user=None):
     # (title, url) generator
     titles_links = ((anchor.text, anchor['href']) for anchor in title_link_url_anchors)
     post_urls = [anchor.text for anchor in post_url_anchors]
-    subreddits = (anchor.text[3:].replace('/','') for anchor in subreddit_anchors)
+
+    # Ignore the /r/.
+    subreddits = (anchor.text[2:].replace('/','') for anchor in subreddit_anchors)
     if user is None:
         users = (anchor.text for anchor in user_anchors)
     else:
