@@ -35,11 +35,12 @@ class Reddit(object):
 
         self._cookies = response.cookies
 
-        self._reddit = praw.Reddit(user_agent=USER_AGENT,
-                             client_id=self._client_id,
-                             client_secret=self._client_secret,
-                             username=self._username,
-                             password=self._password)
+        if self._client_id:
+            self._reddit = praw.Reddit(user_agent=USER_AGENT,
+                                 client_id=self._client_id,
+                                 client_secret=self._client_secret,
+                                 username=self._username,
+                                 password=self._password)
 
     def _get_url(self, url):
         """Return the response from getting the url as the signed in user."""
