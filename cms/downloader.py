@@ -149,7 +149,6 @@ class EroShare(DownloaderBase):
         self.img_urls = None
         if match:
             id_ = EROSHARE_ID_REGEX.search(match['id']).groupdict()['id']
-            print(id_)
             self.img_urls = [(id_, EROSHARE_FMT_URL % id_)]
 
         self._initialized = True
