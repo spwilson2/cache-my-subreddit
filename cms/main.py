@@ -96,7 +96,8 @@ def user(output, databasedir, number, username):
 def clean_for_use_as_path(string):
     string = re.sub(r'[^%s]' % CHAR_WHITELIST, '-', string)
     string = re.sub(r'[ ]+', '_', string) # Replace spaces with _
-    return string
+    # Shorten the title so the path is reasonable.
+    return string[:60]
 
 def save(submission, database, basedir='output'):
     basedir = os.path.dirname(os.path.abspath(__file__)) if basedir is None else basedir

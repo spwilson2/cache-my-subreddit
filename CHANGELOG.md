@@ -3,21 +3,21 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## UNRELEASED
-## [0.5.8] - 2017-8-19
-### ADDED
-- Improved reliability when network connections temporarily fail.
-  - Multiple attempts to download an album will be made before soft failing, an exception will no longer occur.
-### MODIFIED
-- Fix downloading of non jpg from imgur based on file type
 
 ## TODO
-- Automatically shorten filenames to appropriate length
 - Optimize the parsing use a .find loop rather than multiple find\_all.
 - Bring back support for reading list of all friends rather than through praw.
 - Use a hash to detect duplicates of downloaded images 
     - Use symlinks to keep a structure and store hashes in a flat directory.
 - Add support for downloading from multiple clients and saving to a single server.
 
+## [0.5.8] - 2017-8-19
+### ADDED
+- Improved reliability when network connections temporarily fail.
+  - Multiple attempts to download an album will be made before soft failing, an exception will no longer occur.
+### MODIFIED
+- Fix downloading of non jpg from imgur based on file type
+- Automatically shorten filenames to appropriate length (Full titles can't be used)
 
 ## [0.5.7] - 2017-8-19
 ### ADDED
