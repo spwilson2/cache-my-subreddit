@@ -51,7 +51,8 @@ class DownloaderBase(object):
             dl_path = os.path.join(folder, pfx+sfx+count+file_ext)
 
             if os.path.exists(dl_path):
-                raise BadPathException('%s already exists.' % dl_path)
+                # We explicitily print instead of raise.
+                print(BadPathException('%s already exists.' % dl_path))
             else:
                 _download(image_url, dl_path)
 
@@ -80,6 +81,11 @@ class Gfycat(DownloaderBase):
         # Read in the images now so we can get stats and stuff:
         response_bs = BeautifulSoup(response.text)
         match = response_bs.find(id='share-video')
+        if match is None:
+            print("Didn't find:", str(self.album_url))
+            self.img_urls = []
+            return
+
         match = match.find('source', type=re.compile('type/(mp4)|(webm)|(jpg)'))
         if match:
             self.img_urls = [(os.path.basename(match['src']), match['src'])]

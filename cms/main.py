@@ -2,6 +2,7 @@ import os
 import re
 
 import click
+import requests
 
 import cms.downloader
 import cms.reddit
@@ -118,12 +119,26 @@ def save(submission, database, basedir='output'):
             pass
         else:
             os.makedirs(savedir)
-        images = downloader.save(savedir,pfx='Post')
 
-    # Add the file to our database.
-    print('Title: %-30s\tFriend: %-15s\tSubreddit: %-15s' %
-            (submission.title, submission.author, submission.subreddit))
-    database.add_post(submission, images, savedir)
+        # Number of retries to download
+        for _ in range(3):
+            try:
+                images = downloader.save(savedir,pfx='Post')
+            except requests.exceptions.ConnectionError:
+                # Retry again if failed to connect
+                pass
+            else:
+                break
+        else:
+            # We failed the allotted number of times don't add it to the
+            # database.
+            print('Unable to reach the destination of %s, skipping...' % submission.title)
+            return
+
+        # Add the file to our database.
+        print('Title: %-30s\tFriend: %-15s\tSubreddit: %-15s' %
+                (submission.title, submission.author, submission.subreddit))
+        database.add_post(submission, images, savedir)
 
 if __name__ == '__main__':
     friends('./')
