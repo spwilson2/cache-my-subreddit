@@ -11,7 +11,6 @@ from cms.database import Database
 CHAR_WHITELIST = r'\w,.\- '
 
 _download_options = [
-		click.option('-c', '--config', type=click.Path(), default='./login.ini', help='Path of the config file.'),
 		click.option('-o', '--output', type=click.Path(), default='./output', help='Dir to output all files to.'),
 		click.option('-d', '--databasedir', type=click.Path(), default='./output', help='Dir to place the sqlite database in.'),
         click.option('-n', '--number', type=click.INT, default=10, help='The number of posts to download.'),
@@ -36,6 +35,7 @@ def config(config):
 
 @cli.command()
 @click.argument('subreddit', type=click.STRING)
+@click.option('-c', '--config', type=click.Path(), default='./login.ini', help='Path of the config file.')
 @_add_options(_download_options)
 def subreddit(output, number, config, subreddit, databasedir):
 
@@ -55,6 +55,7 @@ def subreddit(output, number, config, subreddit, databasedir):
 
 
 @cli.command()
+@click.option('-c', '--config', type=click.Path(), default='./login.ini', help='Path of the config file.')
 @_add_options(_download_options)
 def friends(output, config, databasedir, number):
     client_id, client_secret, username, password =\
@@ -76,6 +77,19 @@ def friends(output, config, databasedir, number):
         print('==================================================================')
         for submission in r.user_submissions(friend, limit=number):
             save(submission, database, basedir=output)
+
+@cli.command()
+@click.argument('username', type=click.STRING)
+@_add_options(_download_options)
+def user(output, databasedir, number, username):
+    database = Database(databasedir)
+    r = cms.reddit.Reddit()
+
+    print('==================================================================')
+    print('Downloading uploads for %s' % username)
+    print('==================================================================')
+    for submission in r.user_submissions(username, limit=number):
+        save(submission, database, basedir=output)
 
 
 def clean_for_use_as_path(string):
