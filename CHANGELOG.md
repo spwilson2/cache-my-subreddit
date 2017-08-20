@@ -7,9 +7,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### ADDED
 - Improved reliability when network connections temporarily fail.
   - Multiple attempts to download an album will be made before soft failing, an exception will no longer occur.
+### MODIFIED
+- Fix downloading of non jpg from imgur based on file type
 
 ## TODO
-- Fix downloading of non jpg from imgur.
+- Automatically shorten filenames to appropriate length
 - Optimize the parsing use a .find loop rather than multiple find\_all.
 - Bring back support for reading list of all friends rather than through praw.
 - Use a hash to detect duplicates of downloaded images 

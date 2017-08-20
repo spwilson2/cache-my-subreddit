@@ -15,6 +15,8 @@ EROSHARE_URL_REGEX = r'^https?\:\/\/(www\.)?eroshare\.com/[a-zA-Z0-9#]+$'
 EROSHARE_ID_REGEX = re.compile(r'player-(?P<id>\w+)')
 EROSHARE_FMT_URL = 'https://v.eroshare.com/%s.mp4'
 
+GLOB_ALL = re.compile('.?')
+
 class DownloaderBase(object):
     def __init__(self, album_url):
         # Get album actual url
@@ -121,7 +123,14 @@ class Imgur(DownloaderBase):
                 id=re.compile('[a-zA-Z0-9]+'),
                 class_='post-image-container')
 
-        self.img_urls = [(match['id'], IMGUR_FMT_URL % match['id']) for match in matches]
+        # Get the src tag from each post-image-container.
+        self.img_urls = []
+        for match in matches:
+            source = match.find(src=GLOB_ALL)
+            if source:
+                source = source.get('src')
+                if source:
+                    self.img_urls.append((match['id'], 'http://' + source.lstrip('/')))
 
         self._initialized = True
 
