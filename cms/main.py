@@ -76,8 +76,13 @@ def friends(output, config, databasedir, number):
         print('==================================================================')
         print('Downloading uploads for %s' % friend)
         print('==================================================================')
-        for submission in r.user_submissions(friend, limit=number):
-            save(submission, database, basedir=output)
+        def save_user_submissions():
+            for submission in r.user_submissions(friend, limit=number):
+                save(submission, database, basedir=output)
+        retval = _retry_on_connection_fail(save_user_submissions)
+        if retval is None:
+            print ('ConnectionError! There may be something wrong with your'
+                    ' connection.')
 
 @cli.command()
 @click.argument('username', type=click.STRING)
@@ -89,8 +94,13 @@ def user(output, databasedir, number, username):
     print('==================================================================')
     print('Downloading uploads for %s' % username)
     print('==================================================================')
-    for submission in r.user_submissions(username, limit=number):
-        save(submission, database, basedir=output)
+    def save_user_submissions():
+        for submission in r.user_submissions(username, limit=number):
+            save(submission, database, basedir=output)
+    retval = _retry_on_connection_fail(save_user_submissions)
+    if retval is None:
+        print ('ConnectionError! There may be something wrong with your'
+                ' connection.')
 
 
 def clean_for_use_as_path(string):
@@ -122,24 +132,27 @@ def save(submission, database, basedir='output'):
             os.makedirs(savedir)
 
         # Number of retries to download
-        for _ in range(3):
-            try:
-                images = downloader.save(savedir,pfx='Post')
-            except requests.exceptions.ConnectionError:
-                # Retry again if failed to connect
-                pass
-            else:
-                break
-        else:
+        images = _retry_on_connection_fail(lambda:downloader.save(savedir,
+                pfx='Post'))
+        if images is None:
             # We failed the allotted number of times don't add it to the
             # database.
             print('Unable to reach the destination of %s, skipping...' % submission.title)
             return
+        else:
+            images = images[0]
 
         # Add the file to our database.
         print('Title: %-30s\tFriend: %-15s\tSubreddit: %-15s' %
                 (submission.title, submission.author, submission.subreddit))
         database.add_post(submission, images, savedir)
 
+def _retry_on_connection_fail(func, retries=3):
+    for _ in range(retries):
+        try:
+            return (func(),)
+        except requests.exceptions.ConnectionError:
+            # Retry again if failed to connect
+            pass
 if __name__ == '__main__':
     friends('./')

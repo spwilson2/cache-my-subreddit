@@ -10,7 +10,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Use a hash to detect duplicates of downloaded images 
     - Use symlinks to keep a structure and store hashes in a flat directory.
 - Add support for downloading from multiple clients and saving to a single server.
-- Add parsing of user comments to look for links.
 
 ## [0.5.8] - 2017-8-19
 ### ADDED
