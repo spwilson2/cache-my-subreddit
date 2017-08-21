@@ -7,9 +7,11 @@ from cms.util import UnsupportedLinkException, BadPathException, BeautifulSoup
 
 IMGUR_IMAGE_URL_REGEX = r'^https?\:\/\/(www\.)?(?:[mi]\.)?imgur\.com/' +\
                 r'((gallery)/)?(?P<album_id>[a-zA-Z0-9/]+)(#[0-9]+)?$'
-IMGUR_FMT_URL = 'http://i.imgur.com/%s.jpg'
 
 GFYCAT_URL_REGEX = r'^https?\:\/\/(www\.)?gfycat\.com/[a-zA-Z0-9]+$'
+
+IREDDIT_URL_REGEX = (r'^https?\:\/\/(www\.)?i\.redd\.it/(?P<id>[a-zA-Z0-9]+)'
+                     '[a-zA-Z0-9.]+$') # The file extension
 
 EROSHARE_URL_REGEX = r'^https?\:\/\/(www\.)?eroshare\.com/[a-zA-Z0-9#]+$'
 EROSHARE_ID_REGEX = re.compile(r'player-(?P<id>\w+)')
@@ -48,7 +50,7 @@ class DownloaderBase(object):
         for count, (id_, image_url) in enumerate(self.img_urls):
 
             count = '-'+str(count) if count else ''
-            file_ext = Gfycat.file_ext_from_url(image_url) if ext is None else ext
+            file_ext = self.file_ext_from_url(image_url) if ext is None else ext
 
             dl_path = os.path.join(folder, pfx+sfx+count+file_ext)
 
@@ -134,6 +136,21 @@ class Imgur(DownloaderBase):
 
         self._initialized = True
 
+class IReddit(DownloaderBase):
+    url_regex = IREDDIT_URL_REGEX
+
+    def __init__(self, album_url):
+        # Make sure that the url is a match.
+        self._init_link(album_url)
+        self._initialized = True
+
+    def _init_link(self, url):
+        match = re.search(IReddit.url_regex, url)
+        if match:
+            self.album_url = url
+            self.img_urls = ((match.groupdict()['id'], url),)
+        else:
+            raise UnsupportedLinkException()
 
 class EroShare(DownloaderBase):
     url_regex = EROSHARE_URL_REGEX
@@ -172,7 +189,7 @@ class EroShare(DownloaderBase):
 class UniversalDownloader(object):
     def __init__(self, album_url):
         self.downloader = None
-        for downloader in [Imgur, Gfycat, EroShare]:
+        for downloader in [Imgur, Gfycat, EroShare, IReddit]:
             if downloader.is_link(album_url):
                 self.downloader = downloader(album_url)
                 return
