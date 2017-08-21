@@ -18,6 +18,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.5.9] - 2017-8-20
 ### ADDED
 - Add support for ireddit links.
+### MODIFIED
+- Fix support for imgur direct image links.
 
 ## [0.5.8] - 2017-8-19
 ### ADDED

@@ -5,13 +5,16 @@ import requests
 
 from cms.util import UnsupportedLinkException, BadPathException, BeautifulSoup
 
-IMGUR_IMAGE_URL_REGEX = r'^https?\:\/\/(www\.)?(?:[mi]\.)?imgur\.com/' +\
-                r'((gallery)/)?(?P<album_id>[a-zA-Z0-9/]+)(#[0-9]+)?$'
+IMGUR_IMAGE_URL_REGEX = (r'^https?\:\/\/(www\.)?(?:[mi]\.)?imgur\.com\/'
+                         '((gallery)\/)?(?P<album_id>[a-zA-Z0-9/]+)'
+                         '(#[0-9]+)?$')
+BASE_IMGUR_URL_REGEX =  (r'^https?\:\/\/(www\.)?(?:[mi]\.)?imgur\.com\/'
+
+                        )
 
 GFYCAT_URL_REGEX = r'^https?\:\/\/(www\.)?gfycat\.com/[a-zA-Z0-9]+$'
 
-IREDDIT_URL_REGEX = (r'^https?\:\/\/(www\.)?i\.redd\.it/(?P<id>[a-zA-Z0-9]+)'
-                     '[a-zA-Z0-9.]+$') # The file extension
+IREDDIT_URL_REGEX = r'^https?\:\/\/(www\.)?i\.redd\.it/[a-zA-Z0-9.]+$'
 
 EROSHARE_URL_REGEX = r'^https?\:\/\/(www\.)?eroshare\.com/[a-zA-Z0-9#]+$'
 EROSHARE_ID_REGEX = re.compile(r'player-(?P<id>\w+)')
@@ -97,18 +100,26 @@ class Gfycat(DownloaderBase):
         self._initialized = True
 
 class Imgur(DownloaderBase):
-    url_regex = IMGUR_IMAGE_URL_REGEX
+    url_regex = BASE_IMGUR_URL_REGEX
     def __init__(self, album_url):
         # Get album actual url
         self._init_link(album_url)
         self._initialized = False
 
     def _init_link(self, url):
-        match = re.search(Imgur.url_regex, url)
+        # First check with a more specific regex, the album regex
+        match = re.search(IMGUR_IMAGE_URL_REGEX, url)
         if match:
             self.album_url = 'http://imgur.com/' + match.group('album_id')
         else:
-            raise UnsupportedLinkException()
+            # Otherwise check with a single item regex.
+            match = re.search(self.url_regex, url)
+            if match:
+                self.album_url = url
+                self.img_urls = ((os.path.basename(url), url),)
+                self._initialized = True
+            else:
+                raise UnsupportedLinkException()
 
     def _init_images(self):
         try:
@@ -148,7 +159,7 @@ class IReddit(DownloaderBase):
         match = re.search(IReddit.url_regex, url)
         if match:
             self.album_url = url
-            self.img_urls = ((match.groupdict()['id'], url),)
+            self.img_urls = ((os.path.basename(url), url),)
         else:
             raise UnsupportedLinkException()
 
@@ -203,9 +214,13 @@ def _download(url, path):
                 f.write(chunk)
 
 if __name__ == '__main__':
-    url = 'https://eroshare.com/pibgaw80#'
+    #url = 'https://eroshare.com/pibgaw80#'
+    url = 'https://i.imgur.com/DcggnoL.jpg'
     savedir = 'output'
     downloader = UniversalDownloader(url).downloader
+    regex = re.compile(IMGUR_IMAGE_URL_REGEX)
+    print(regex.search(url))
+    print(downloader)
     if downloader:
         if not os.path.exists(savedir):
             os.makedirs(savedir)

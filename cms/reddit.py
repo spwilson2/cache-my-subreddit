@@ -103,9 +103,7 @@ class Post(object):
 
     @staticmethod
     def wrap(post):
-        p = Post(post.title, post.author.name, post.url, post.shortlink, post.subreddit.display_name)
-        print(post.url)
-        return p
+        return Post(post.title, post.author.name, post.url, post.shortlink, post.subreddit.display_name)
 
 
 def _get_next_link(bs_obj):
