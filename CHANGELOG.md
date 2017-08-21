@@ -3,13 +3,25 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## UNRELEASED
-
 ## TODO
-- Optimize the parsing use a .find loop rather than multiple find\_all.
+- Reduce duplicates
+    - Use a hash to detect duplicates of downloaded images
+        - Use symlinks to keep a structure and store hashes in a flat directory.
+    - Add an additional check with the database to see if an entry with the `album_url` exists (To reduce duplicate downloads)
+- Change to sqlite builtin to reduce dependency on sqlalchemy
 - Bring back support for reading list of all friends rather than through praw.
-- Use a hash to detect duplicates of downloaded images 
-    - Use symlinks to keep a structure and store hashes in a flat directory.
+    - (Then remove use of praw since this is its only use.)
 - Add support for downloading from multiple clients and saving to a single server.
+- Optimize the parsing use a .find loop rather than multiple find\_all.
+  - (Very low priority, little cost comes from parsing the html)
+- Global refactoring.
+  - Much of the downloader stuff is amateur, it could probably all be redone.
+
+## [0.5.9] - 2017-8-20
+### ADDED
+- Add support for ireddit links.
+### MODIFIED
+- Fix support for imgur direct image links.
 
 ## [0.5.8] - 2017-8-19
 ### ADDED
