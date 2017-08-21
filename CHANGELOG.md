@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Add support for downloading from multiple clients and saving to a single server.
 - Optimize the parsing use a .find loop rather than multiple find\_all.
   - (Very low priority, little cost comes from parsing the html)
+- Global refactoring.
+  - Much of the downloader stuff is amateur, it could probably all be redone.
 
 ## [0.5.9] - 2017-8-20
 ### ADDED
