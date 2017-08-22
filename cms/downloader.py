@@ -14,9 +14,7 @@ GFYCAT_URL_REGEX = r'^https?\:\/\/(www\.)?gfycat\.com/[a-zA-Z0-9]+$'
 
 IREDDIT_URL_REGEX = r'^https?\:\/\/(www\.)?i\.redd\.it/[a-zA-Z0-9.]+$'
 
-EROSHARE_URL_REGEX = r'^https?\:\/\/(www\.)?eroshare\.com/[a-zA-Z0-9#]+$'
-EROSHARE_ID_REGEX = re.compile(r'player-(?P<id>\w+)')
-EROSHARE_FMT_URL = 'https://v.eroshare.com/%s.mp4'
+EROME_URL_REGEX = r'^https?\:\/\/(www\.)?erome\.com/[/a-zA-Z0-9#]+$'
 
 GLOB_ALL = re.compile('.?')
 
@@ -164,8 +162,8 @@ class IReddit(DownloaderBase):
         else:
             raise UnsupportedLinkException()
 
-class EroShare(DownloaderBase):
-    url_regex = EROSHARE_URL_REGEX
+class EroMe(DownloaderBase):
+    url_regex = EROME_URL_REGEX
 
     def __init__(self, album_url):
         # Get album actual url
@@ -173,7 +171,7 @@ class EroShare(DownloaderBase):
         self._initialized = False
 
     def _init_link(self, url):
-        match = re.search(EroShare.url_regex, url)
+        match = re.search(EroMe.url_regex, url)
         if match:
             self.album_url = url
         else:
@@ -192,8 +190,14 @@ class EroShare(DownloaderBase):
         match = response_bs.find('video')
         self.img_urls = None
         if match:
-            id_ = EROSHARE_ID_REGEX.search(match['id']).groupdict()['id']
-            self.img_urls = [(id_, EROSHARE_FMT_URL % id_)]
+            high_res = match.find('source', label='HD')
+            if high_res:
+                src = high_res['src']
+            else:
+                low_res = match.find('source', label='SD')
+                src = low_res['src']
+            url = 'http://' + src.lstrip('/')
+            self.img_urls = [(url, url)]
 
         self._initialized = True
 
@@ -201,7 +205,7 @@ class EroShare(DownloaderBase):
 class UniversalDownloader(object):
     def __init__(self, album_url):
         self.downloader = None
-        for downloader in [Imgur, Gfycat, EroShare, IReddit]:
+        for downloader in [Imgur, Gfycat, EroMe, IReddit]:
             if downloader.is_link(album_url):
                 self.downloader = downloader(album_url)
                 return
