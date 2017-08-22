@@ -8,9 +8,7 @@ from cms.util import UnsupportedLinkException, BadPathException, BeautifulSoup
 IMGUR_IMAGE_URL_REGEX = (r'^https?\:\/\/(www\.)?(?:[mi]\.)?imgur\.com\/'
                          '((gallery)\/)?(?P<album_id>[a-zA-Z0-9/]+)'
                          '(#[0-9]+)?$')
-BASE_IMGUR_URL_REGEX =  (r'^https?\:\/\/(www\.)?(?:[mi]\.)?imgur\.com\/'
-
-                        )
+BASE_IMGUR_URL_REGEX = r'^https?\:\/\/(www\.)?(?:[mi]\.)?imgur\.com\/'
 
 GFYCAT_URL_REGEX = r'^https?\:\/\/(www\.)?gfycat\.com/[a-zA-Z0-9]+$'
 
@@ -103,8 +101,8 @@ class Imgur(DownloaderBase):
     url_regex = BASE_IMGUR_URL_REGEX
     def __init__(self, album_url):
         # Get album actual url
-        self._init_link(album_url)
         self._initialized = False
+        self._init_link(album_url)
 
     def _init_link(self, url):
         # First check with a more specific regex, the album regex
@@ -118,6 +116,7 @@ class Imgur(DownloaderBase):
                 self.album_url = url
                 self.img_urls = ((os.path.basename(url), url),)
                 self._initialized = True
+                print('That match')
             else:
                 raise UnsupportedLinkException()
 
@@ -130,6 +129,8 @@ class Imgur(DownloaderBase):
             return
 
         # Read in the images now so we can get stats and stuff:
+        #print(response.text)
+        print(self.album_url)
         response_bs = BeautifulSoup(response.text)
         matches = response_bs.find_all(
                 'div',
