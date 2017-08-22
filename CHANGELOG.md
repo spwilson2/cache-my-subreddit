@@ -17,6 +17,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Global refactoring.
   - Much of the downloader stuff is amateur, it could probably all be redone.
 
+## [0.5.10] - 2017-8-21
+### MODIFIED
+- Fix download of direct image links in previous update.
+
 ## [0.5.9] - 2017-8-20
 ### ADDED
 - Add support for ireddit links.
