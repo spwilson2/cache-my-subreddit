@@ -127,8 +127,6 @@ class Imgur(DownloaderBase):
             return
 
         # Read in the images now so we can get stats and stuff:
-        #print(response.text)
-        print(self.album_url)
         response_bs = BeautifulSoup(response.text)
         matches = response_bs.find_all(
                 'div',

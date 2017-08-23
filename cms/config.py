@@ -15,12 +15,12 @@ REDDIT_SECTION = 'Reddit'
 
 def read_oauth_info(file_='login.ini'):
     parser = ConfigParser()
+    print(file_)
     parser.read(file_)
     section = parser[REDDIT_SECTION]
 
-    globals().update(section) # Note: is a security risk, don't be dumb.
-
-    return client_id, client_secret, username, password
+    return section['client_id'], section['client_secret'], \
+            section['username'], section['password']
 
 def write_oauth_info(file_='login.ini'):
     parser = ConfigParser()

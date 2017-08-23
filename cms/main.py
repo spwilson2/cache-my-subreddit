@@ -12,6 +12,8 @@ from cms.database import Database
 CHAR_WHITELIST = r'\w,.\- '
 
 _download_options = [
+    click.option('-c', '--config', type=click.Path(), default='./login.ini',
+        help='Path of the config file.'),
 		click.option('-o', '--output', type=click.Path(), default='./output', help='Dir to output all files to.'),
 		click.option('-d', '--databasedir', type=click.Path(), default='./output', help='Dir to place the sqlite database in.'),
         click.option('-n', '--number', type=click.INT, default=10, help='The number of posts to download.'),
@@ -36,12 +38,11 @@ def config(config):
 
 @cli.command()
 @click.argument('subreddit', type=click.STRING)
-@click.option('-c', '--config', type=click.Path(), default='./login.ini', help='Path of the config file.')
 @_add_options(_download_options)
 def subreddit(output, number, config, subreddit, databasedir):
 
     client_id, client_secret, username, password =\
-    read_oauth_info(config)
+        read_oauth_info(config)
 
     r = cms.reddit.Reddit(
             client_id=client_id,
@@ -56,11 +57,10 @@ def subreddit(output, number, config, subreddit, databasedir):
 
 
 @cli.command()
-@click.option('-c', '--config', type=click.Path(), default='./login.ini', help='Path of the config file.')
 @_add_options(_download_options)
 def friends(output, config, databasedir, number):
     client_id, client_secret, username, password =\
-    read_oauth_info(config)
+        read_oauth_info(config)
 
     r = cms.reddit.Reddit(
             client_id=client_id,
@@ -87,9 +87,18 @@ def friends(output, config, databasedir, number):
 @cli.command()
 @click.argument('username', type=click.STRING)
 @_add_options(_download_options)
-def user(output, databasedir, number, username):
+def user(output, config, databasedir, number, username):
+
+    client_id, client_secret, client_username, password =\
+            read_oauth_info(config)
+
+    r = cms.reddit.Reddit(
+            client_id=client_id,
+            client_secret=client_secret,
+            username=client_username,
+            password=password)
+
     database = Database(databasedir)
-    r = cms.reddit.Reddit()
 
     print('==================================================================')
     print('Downloading uploads for %s' % username)
@@ -97,6 +106,7 @@ def user(output, databasedir, number, username):
     def save_user_submissions():
         for submission in r.user_submissions(username, limit=number):
             save(submission, database, basedir=output)
+            pass
     retval = _retry_on_connection_fail(save_user_submissions)
     if retval is None:
         print ('ConnectionError! There may be something wrong with your'
