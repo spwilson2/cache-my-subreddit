@@ -1,4 +1,6 @@
 import praw
+import prawcore
+import praw.exceptions
 
 USER_AGENT='sheenrocks\' user agent'
 
@@ -32,10 +34,13 @@ class Reddit(object):
             yield Post(submission)
 
     def user_submissions(self, user, limit=1000):
-        submissions = self._reddit.redditor(user).submissions.new()
-        submissions.limit = limit
-        for submission in submissions:
-            yield Post.wrap(submission)
+        try:
+            submissions = self._reddit.redditor(user).submissions.new()
+            submissions.limit = limit
+            for submission in submissions:
+                yield Post.wrap(submission)
+        except prawcore.exceptions.Forbidden:
+            print('Unable to get user_submissions, were they banned?')
 
 class Post(object):
     def __init__(self, title, author, url, shortlink, subreddit):
